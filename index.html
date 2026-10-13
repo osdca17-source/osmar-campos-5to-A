@@ -1,0 +1,1072 @@
+ {<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SoundSphere - Descubre Música, Cantantes y Álbumes</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              neon: '#8b5cf6',
+              cyan: '#06b6d4',
+              pink: '#ec4899',
+              dark: '#0b0f19',
+              card: '#131927',
+              border: '#1f293d'
+            }
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'spin-slow': 'spin 8s linear infinite',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0f19;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1f293d;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #374151;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .glass-card {
+      background: rgba(19, 25, 39, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-nav {
+      background: rgba(11, 15, 25, 0.85);
+      backdrop-filter: blur(16px);
+    }
+    .neon-shadow-pink {
+      box-shadow: 0 0 20px rgba(236, 72, 153, 0.35);
+    }
+    .neon-shadow-purple {
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.35);
+    }
+  </style>
+</head>
+<body class="bg-[#0b0f19] text-gray-100 font-sans antialiased min-h-screen flex flex-col selection:bg-purple-500 selection:text-white pb-28">
+
+  <header class="sticky top-0 z-40 w-full glass-nav border-b border-gray-800/60 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+          <i data-lucide="disc-3" class="w-6 h-6 text-white animate-spin-slow"></i>
+        </div>
+        <span class="font-display font-extrabold text-2xl bg-gradient-to-r from-white via-gray-200 to-purple-400 bg-clip-text text-transparent">
+          Sound<span class="text-purple-500">Sphere</span>
+        </span>
+      </a>
+
+      <!-- Search Bar -->
+      <div class="relative flex-1 max-w-md hidden md:block">
+        <div class="relative">
+          <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+          <input type="text" id="searchInput" placeholder="Buscar artistas, canciones, álbumes..." 
+            class="w-full pl-10 pr-10 py-2.5 rounded-full bg-gray-900/80 border border-gray-700/60 text-sm text-gray-200 placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all">
+          <button id="clearSearch" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+        <!-- Quick Search Live Dropdown -->
+        <div id="searchResultsDropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-[#131927] border border-gray-800 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-96 overflow-y-auto"></div>
+      </div>
+
+      <!-- Navigation Links & User CTA -->
+      <nav class="hidden lg:flex items-center gap-6 text-sm font-medium">
+        <a href="#hero" class="text-gray-300 hover:text-purple-400 transition-colors">Inicio</a>
+        <a href="#artists" class="text-gray-300 hover:text-purple-400 transition-colors">Artistas</a>
+        <a href="#albums" class="text-gray-300 hover:text-purple-400 transition-colors">Álbumes</a>
+        <a href="#trending" class="text-gray-300 hover:text-purple-400 transition-colors">Tendencias</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <!-- Search Mobile Button -->
+        <button id="mobileSearchBtn" class="md:hidden p-2 rounded-full hover:bg-gray-800 text-gray-300">
+          <i data-lucide="search" class="w-5 h-5"></i>
+        </button>
+
+        <!-- CTA User Button -->
+        <button onclick="toggleModal('loginModal')" class="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold text-sm shadow-md neon-shadow-purple transition-all duration-300 hover:scale-105 active:scale-95">
+          <i data-lucide="user-check" class="w-4 h-4"></i>
+          <span>Unirme Club Pass</span>
+        </button>
+
+        <!-- Mobile Menu Toggle -->
+        <button id="mobileMenuBtn" class="lg:hidden p-2 rounded-lg text-gray-300 hover:bg-gray-800">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Mobile Search Overlay -->
+    <div id="mobileSearchOverlay" class="hidden md:hidden px-4 pb-4">
+      <div class="relative">
+        <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+        <input type="text" id="mobileSearchInput" placeholder="Buscar artistas, canciones, álbumes..." 
+          class="w-full pl-10 pr-10 py-2.5 rounded-full bg-gray-900 border border-gray-700 text-sm text-gray-200 focus:outline-none focus:border-purple-500">
+      </div>
+    </div>
+
+    <!-- Mobile Nav Drawer -->
+    <div id="mobileNav" class="hidden lg:hidden border-t border-gray-800/80 bg-[#0b0f19] px-6 py-4 flex flex-col gap-4">
+      <a href="#hero" class="text-gray-200 font-medium hover:text-purple-400 py-1">Inicio</a>
+      <a href="#artists" class="text-gray-200 font-medium hover:text-purple-400 py-1">Artistas</a>
+      <a href="#albums" class="text-gray-200 font-medium hover:text-purple-400 py-1">Álbumes</a>
+      <a href="#trending" class="text-gray-200 font-medium hover:text-purple-400 py-1">Tendencias</a>
+      <button onclick="toggleModal('loginModal')" class="w-full mt-2 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold text-center">
+        Unirme Club Pass
+      </button>
+    </div>
+  </header>
+
+  <section id="hero" class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
+    <div class="relative rounded-3xl overflow-hidden glass-card border border-gray-800 shadow-2xl">
+      
+      <!-- Carousel Slider Outer -->
+      <div id="heroCarousel" class="relative min-h-[420px] md:min-h-[480px] flex transition-transform duration-700 ease-out">
+        <!-- Hero Slides inserted dynamically by JS -->
+      </div>
+
+      <!-- Carousel Navigation Dots & Arrows -->
+      <div class="absolute bottom-6 left-8 sm:left-12 flex items-center gap-3 z-20">
+        <button id="heroPrev" class="p-2.5 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md text-white border border-white/10 transition-all hover:scale-110">
+          <i data-lucide="chevron-left" class="w-5 h-5"></i>
+        </button>
+        <div id="heroDots" class="flex gap-2 mx-2"></div>
+        <button id="heroNext" class="p-2.5 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md text-white border border-white/10 transition-all hover:scale-110">
+          <i data-lucide="chevron-right" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm uppercase tracking-widest font-semibold text-gray-400 flex items-center gap-2">
+        <i data-lucide="sliders" class="w-4 h-4 text-purple-400"></i> Explorar por Género
+      </h3>
+      <button id="resetGenreFilter" class="text-xs text-purple-400 hover:underline hidden">Limpiar filtro</button>
+    </div>
+    
+    <div id="genreContainer" class="flex items-center gap-3 overflow-x-auto pb-2 hide-scrollbar">
+      <!-- Genres dynamically rendered -->
+    </div>
+  </section>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 py-8">
+
+    <section id="artists" class="scroll-mt-24">
+      <div class="flex items-end justify-between mb-8">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-purple-400">Estrellas Mundiales</span>
+          <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-white mt-1">Cantantes Destacados</h2>
+        </div>
+        <a href="#artists" class="text-sm font-semibold text-purple-400 hover:text-purple-300 flex items-center gap-1 group">
+          <span>Ver todos</span>
+          <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+        </a>
+      </div>
+
+      <div id="artistsGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5 sm:gap-6">
+        <!-- Artist cards dynamically rendered -->
+      </div>
+    </section>
+
+    <section id="albums" class="scroll-mt-24">
+      <div class="flex items-end justify-between mb-8">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-pink-400">Colección Imprescindible</span>
+          <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-white mt-1">Álbumes más Escuchados</h2>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="albumsPrevBtn" class="p-2 rounded-full glass-card hover:bg-gray-800 text-white transition">
+            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+          </button>
+          <button id="albumsNextBtn" class="p-2 rounded-full glass-card hover:bg-gray-800 text-white transition">
+            <i data-lucide="chevron-right" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Albums Horizontal Carousel Container -->
+      <div id="albumsCarousel" class="flex gap-6 overflow-x-auto scroll-smooth hide-scrollbar pb-4 -mx-2 px-2">
+        <!-- Album cards dynamically rendered -->
+      </div>
+    </section>
+
+    <section id="trending" class="scroll-mt-24">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">Top 10 Global</span>
+          <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-white mt-1">Sencillos en Tendencia</h2>
+        </div>
+        <p class="text-sm text-gray-400 max-w-md">
+          Haz clic en cualquier canción para reproducirla de inmediato en el reproductor interactivo.
+        </p>
+      </div>
+
+      <div class="glass-card rounded-2xl p-4 sm:p-6 border border-gray-800/80">
+        <div id="songsList" class="divide-y divide-gray-800/60">
+          <!-- Songs dynamically rendered -->
+        </div>
+      </div>
+    </section>
+
+    <section class="relative rounded-3xl overflow-hidden p-8 sm:p-12 my-12 bg-gradient-to-r from-purple-900/60 via-indigo-900/50 to-pink-900/60 border border-purple-500/30">
+      <div class="absolute -right-20 -top-20 w-80 h-80 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 max-w-2xl">
+        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase bg-pink-500/20 text-pink-300 border border-pink-500/30 inline-block mb-4">
+          Acceso Exclusivo VIP
+        </span>
+        <h2 class="font-display text-3xl sm:text-5xl font-extrabold text-white leading-tight">
+          ¿Quieres ser el primero en escuchar los estrenos?
+        </h2>
+        <p class="text-gray-300 mt-4 text-base sm:text-lg">
+          Suscríbete a nuestro boletín semanal y recibe acceso anticipado a álbumes, playlists personalizadas y entradas para conciertos.
+        </p>
+
+        <form id="subscribeForm" class="mt-8 flex flex-col sm:flex-row gap-3 max-w-md">
+          <input type="email" placeholder="Ingresa tu correo electrónico..." required 
+            class="px-5 py-3.5 rounded-full bg-gray-900/90 border border-gray-700 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 flex-1">
+          <button type="submit" class="px-7 py-3.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-sm shadow-lg hover:scale-105 active:scale-95 transition-all whitespace-nowrap">
+            Suscribirme gratis
+          </button>
+        </form>
+        <p id="subscribeSuccess" class="hidden text-emerald-400 text-sm font-semibold mt-3 flex items-center gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4"></i> ¡Te has suscrito con éxito! Revisa tu bandeja.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="playerBar" class="fixed bottom-0 left-0 right-0 z-50 glass-nav border-t border-gray-800 px-4 py-3 shadow-2xl transition-transform duration-300 transform translate-y-0">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-6">
+      
+      <!-- Current Track Info -->
+      <div class="flex items-center gap-3 w-full sm:w-1/4 min-w-0">
+        <img id="playerImg" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=150&auto=format&fit=crop" 
+          alt="Now playing" class="w-12 h-12 rounded-lg object-cover shadow border border-gray-700/60 flex-shrink-0">
+        <div class="min-w-0 flex-1">
+          <h4 id="playerTitle" class="text-sm font-bold text-white truncate">Selecciona una canción</h4>
+          <p id="playerArtist" class="text-xs text-gray-400 truncate">SoundSphere Music</p>
+        </div>
+        <button id="playerLikeBtn" class="text-gray-400 hover:text-pink-500 transition-colors ml-1">
+          <i data-lucide="heart" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Controls & Progress Bar -->
+      <div class="flex flex-col items-center gap-1.5 w-full sm:w-2/4">
+        <div class="flex items-center gap-4">
+          <button id="shuffleBtn" class="text-gray-400 hover:text-white transition"><i data-lucide="shuffle" class="w-4 h-4"></i></button>
+          <button id="prevBtn" class="text-gray-300 hover:text-white transition"><i data-lucide="skip-back" class="w-5 h-5"></i></button>
+          <button id="playBtn" class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition">
+            <i data-lucide="play" class="w-5 h-5 fill-current ml-0.5"></i>
+          </button>
+          <button id="nextBtn" class="text-gray-300 hover:text-white transition"><i data-lucide="skip-forward" class="w-5 h-5"></i></button>
+          <button id="repeatBtn" class="text-gray-400 hover:text-white transition"><i data-lucide="repeat" class="w-4 h-4"></i></button>
+        </div>
+
+        <div class="w-full flex items-center gap-3 text-xs text-gray-400 font-mono">
+          <span id="currentTime">0:00</span>
+          <div id="progressContainer" class="flex-1 h-1.5 bg-gray-800 rounded-full cursor-pointer relative overflow-hidden group">
+            <div id="progressBar" class="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full w-0 transition-all duration-150"></div>
+          </div>
+          <span id="duration">3:30</span>
+        </div>
+      </div>
+
+      <!-- Volume & Extras -->
+      <div class="hidden sm:flex items-center justify-end gap-3 w-1/4">
+        <i data-lucide="volume-2" class="w-4 h-4 text-gray-400"></i>
+        <input type="range" id="volumeSlider" min="0" max="100" value="80" 
+          class="w-20 h-1.5 bg-gray-800 accent-purple-500 rounded-lg cursor-pointer">
+      </div>
+
+    </div>
+  </div>
+
+  <div id="detailModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="relative w-full max-w-3xl glass-card rounded-3xl border border-gray-800 shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in duration-200">
+      <button onclick="toggleModal('detailModal')" class="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/60 text-gray-300 hover:text-white transition">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+
+      <div id="modalContent">
+        <!-- Content injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <div id="loginModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="relative w-full max-w-md glass-card rounded-3xl border border-gray-800 p-6 sm:p-8 shadow-2xl">
+      <button onclick="toggleModal('loginModal')" class="absolute top-4 right-4 p-2 rounded-full text-gray-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 mx-auto flex items-center justify-center mb-3">
+          <i data-lucide="sparkles" class="w-6 h-6 text-white"></i>
+        </div>
+        <h3 class="font-display text-2xl font-bold text-white">SoundSphere VIP Pass</h3>
+        <p class="text-xs text-gray-400 mt-1">Obtén audio Hi-Fi ilimitado y descargas sin conexión</p>
+      </div>
+
+      <form onsubmit="event.preventDefault(); alert('¡Bienvenido al Club Pass de SoundSphere!'); toggleModal('loginModal');" class="space-y-4">
+        <div>
+          <label class="text-xs font-semibold text-gray-300 block mb-1">Nombre Completo</label>
+          <input type="text" placeholder="Ej. Alex Turner" required class="w-full px-4 py-2.5 rounded-xl bg-gray-900 border border-gray-700 text-sm text-white focus:outline-none focus:border-purple-500">
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-gray-300 block mb-1">Correo Electrónico</label>
+          <input type="email" placeholder="alex@ejemplo.com" required class="w-full px-4 py-2.5 rounded-xl bg-gray-900 border border-gray-700 text-sm text-white focus:outline-none focus:border-purple-500">
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 font-bold text-white text-sm shadow-lg hover:scale-[1.02] transition">
+          Iniciar Prueba Gratuita (30 días)
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <footer class="bg-[#070a12] border-t border-gray-800/80 mt-auto text-gray-400 text-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+      
+      <!-- Col 1 -->
+      <div class="space-y-4">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center">
+            <i data-lucide="disc-3" class="w-5 h-5 text-white"></i>
+          </div>
+          <span class="font-display font-bold text-xl text-white">SoundSphere</span>
+        </div>
+        <p class="text-xs text-gray-400 leading-relaxed">
+          La experiencia musical definitiva para jóvenes y melómanos. Descubre artistas en tendencia, discografías completas y sencillos en tiempo real.
+        </p>
+      </div>
+
+      <!-- Col 2 -->
+      <div>
+        <h4 class="text-white font-semibold mb-3">Navegación</h4>
+        <ul class="space-y-2 text-xs">
+          <li><a href="#hero" class="hover:text-purple-400 transition">Destacados</a></li>
+          <li><a href="#artists" class="hover:text-purple-400 transition">Cantantes Populares</a></li>
+          <li><a href="#albums" class="hover:text-purple-400 transition">Álbumes del Año</a></li>
+          <li><a href="#trending" class="hover:text-purple-400 transition">Top Sencillos</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3 -->
+      <div>
+        <h4 class="text-white font-semibold mb-3">Géneros Musicales</h4>
+        <ul class="space-y-2 text-xs">
+          <li><a href="#" onclick="filterByGenre('Reggaeton'); return false;" class="hover:text-purple-400 transition">Reggaeton / Urbano</a></li>
+          <li><a href="#" onclick="filterByGenre('Pop'); return false;" class="hover:text-purple-400 transition">Pop Internacional</a></li>
+          <li><a href="#" onclick="filterByGenre('Trap'); return false;" class="hover:text-purple-400 transition">Trap Latino</a></li>
+          <li><a href="#" onclick="filterByGenre('R&B'); return false;" class="hover:text-purple-400 transition">R&B & Soul</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4 -->
+      <div>
+        <h4 class="text-white font-semibold mb-3">Redes & Comunidad</h4>
+        <div class="flex gap-3 mb-4">
+          <a href="#" class="w-9 h-9 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-300 hover:text-purple-400 hover:border-purple-500 transition">
+            <i data-lucide="instagram" class="w-4 h-4"></i>
+          </a>
+          <a href="#" class="w-9 h-9 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-300 hover:text-purple-400 hover:border-purple-500 transition">
+            <i data-lucide="twitter" class="w-4 h-4"></i>
+          </a>
+          <a href="#" class="w-9 h-9 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-300 hover:text-purple-400 hover:border-purple-500 transition">
+            <i data-lucide="youtube" class="w-4 h-4"></i>
+          </a>
+        </div>
+        <p class="text-xs text-gray-500">© 2026 SoundSphere. Todos los derechos reservados.</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <script>
+    // --- APP DATA STORE ---
+    const ARTISTS = [
+      {
+        id: 'bad-bunny',
+        name: 'Bad Bunny',
+        genre: 'Reggaeton',
+        image: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=500&auto=format&fit=crop',
+        banner: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&auto=format&fit=crop',
+        monthlyListeners: '81.4M',
+        bio: 'El astro puertorriqueño que ha revolucionado la música urbana y el trap latino a nivel mundial.',
+        popularSongs: [
+          { title: 'Monaco', duration: '4:27', album: 'Nadie Sabe Lo Que Va A Pasar Mañana' },
+          { title: 'Me Porto Bonito', duration: '2:58', album: 'Un Verano Sin Ti' },
+          { title: 'Titi Me Preguntó', duration: '4:03', album: 'Un Verano Sin Ti' }
+        ]
+      },
+      {
+        id: 'taylor-swift',
+        name: 'Taylor Swift',
+        genre: 'Pop',
+        image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop',
+        banner: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1200&auto=format&fit=crop',
+        monthlyListeners: '102.5M',
+        bio: 'Ícono de la composición pop contemporánea, rompiendo récords históricos con cada era musical.',
+        popularSongs: [
+          { title: 'Cruel Summer', duration: '2:58', album: 'Lover' },
+          { title: 'Anti-Hero', duration: '3:20', album: 'Midnights' },
+          { title: 'Fortnight (feat. Post Malone)', duration: '3:48', album: 'The Tortured Poets Department' }
+        ]
+      },
+      {
+        id: 'the-weeknd',
+        name: 'The Weeknd',
+        genre: 'R&B',
+        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop',
+        banner: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1200&auto=format&fit=crop',
+        monthlyListeners: '108.2M',
+        bio: 'Abel Tesfaye domina las listas globales con sus producciones synth-pop y R&B cinematográfico.',
+        popularSongs: [
+          { title: 'Blinding Lights', duration: '3:20', album: 'After Hours' },
+          { title: 'Starboy', duration: '3:50', album: 'Starboy' },
+          { title: 'Save Your Tears', duration: '3:35', album: 'After Hours' }
+        ]
+      },
+      {
+        id: 'rosalia',
+        name: 'Rosalía',
+        genre: 'Pop',
+        image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&auto=format&fit=crop',
+        banner: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200&auto=format&fit=crop',
+        monthlyListeners: '38.9M',
+        bio: 'Pionera de la vanguardia que fusiona flamenco tradicional, neopercusión y pop experimental.',
+        popularSongs: [
+          { title: 'DESPECHÁ', duration: '2:37', album: 'MOTOMAMI' },
+          { title: 'SAOKO', duration: '2:17', album: 'MOTOMAMI' },
+          { title: 'LA FAMA (feat. The Weeknd)', duration: '3:08', album: 'MOTOMAMI' }
+        ]
+      },
+      {
+        id: 'drake',
+        name: 'Drake',
+        genre: 'Trap',
+        image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop',
+        banner: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&auto=format&fit=crop',
+        monthlyListeners: '84.1M',
+        bio: 'Leyenda canadiense del hip-hop y trap moderno que ha colocado decenas de sencillos en el #1.',
+        popularSongs: [
+          { title: 'First Person Shooter', duration: '4:07', album: 'For All The Dogs' },
+          { title: 'God\'s Plan', duration: '3:18', album: 'Scorpion' },
+          { title: 'One Dance', duration: '2:53', album: 'Views' }
+        ]
+      },
+      {
+        id: 'billie-eilish',
+        name: 'Billie Eilish',
+        genre: 'Indie',
+        image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=500&auto=format&fit=crop',
+        banner: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1200&auto=format&fit=crop',
+        monthlyListeners: '98.3M',
+        bio: 'Prodigio del alt-pop caracterizada por voces susurradas, ritmos oscuros e introspección profunda.',
+        popularSongs: [
+          { title: 'LUNCH', duration: '2:59', album: 'HIT ME HARD AND SOFT' },
+          { title: 'bad guy', duration: '3:14', album: 'WHEN WE ALL FALL ASLEEP...' },
+          { title: 'What Was I Made For?', duration: '3:42', album: 'Barbie The Album' }
+        ]
+      }
+    ];
+
+    const ALBUMS = [
+      {
+        id: 'alb-1',
+        title: 'HIT ME HARD AND SOFT',
+        artist: 'Billie Eilish',
+        year: '2024',
+        cover: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=500&auto=format&fit=crop',
+        genre: 'Indie',
+        tracks: ['SKINNY', 'LUNCH', 'CHIHIRO', 'BIRDS OF A FEATHER', 'WILDFLOWER', 'THE GREATEST']
+      },
+      {
+        id: 'alb-2',
+        title: 'Un Verano Sin Ti',
+        artist: 'Bad Bunny',
+        year: '2022',
+        cover: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=500&auto=format&fit=crop',
+        genre: 'Reggaeton',
+        tracks: ['Moscow Mule', 'Después de la Playa', 'Me Porto Bonito', 'Titi Me Preguntó', 'Un CientoBomba']
+      },
+      {
+        id: 'alb-3',
+        title: 'Midnights',
+        artist: 'Taylor Swift',
+        year: '2022',
+        cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&auto=format&fit=crop',
+        genre: 'Pop',
+        tracks: ['Lavender Haze', 'Maroon', 'Anti-Hero', 'Snow On The Beach', 'You\'re On Your Own, Kid']
+      },
+      {
+        id: 'alb-4',
+        title: 'After Hours',
+        artist: 'The Weeknd',
+        year: '2020',
+        cover: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=500&auto=format&fit=crop',
+        genre: 'R&B',
+        tracks: ['Alone Again', 'Too Late', 'Hardest To Love', 'Scared To Live', 'Blinding Lights', 'Save Your Tears']
+      },
+      {
+        id: 'alb-5',
+        title: 'MOTOMAMI',
+        artist: 'Rosalía',
+        year: '2022',
+        cover: 'https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=500&auto=format&fit=crop',
+        genre: 'Pop',
+        tracks: ['SAOKO', 'CANDY', 'LA FAMA', 'BULERÍAS', 'CHICKEN TERIYAKI', 'HENTAI']
+      }
+    ];
+
+    const TRACKS = [
+      { id: 'tr-1', title: 'LUNCH', artist: 'Billie Eilish', duration: '2:59', genre: 'Indie', cover: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=150&auto=format&fit=crop' },
+      { id: 'tr-2', title: 'Monaco', artist: 'Bad Bunny', duration: '4:27', genre: 'Reggaeton', cover: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=150&auto=format&fit=crop' },
+      { id: 'tr-3', title: 'Blinding Lights', artist: 'The Weeknd', duration: '3:20', genre: 'R&B', cover: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=150&auto=format&fit=crop' },
+      { id: 'tr-4', title: 'Cruel Summer', artist: 'Taylor Swift', duration: '2:58', genre: 'Pop', cover: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop' },
+      { id: 'tr-5', title: 'DESPECHÁ', artist: 'Rosalía', duration: '2:37', genre: 'Pop', cover: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop' },
+      { id: 'tr-6', title: 'First Person Shooter', artist: 'Drake ft. J. Cole', duration: '4:07', genre: 'Trap', cover: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop' }
+    ];
+
+    const GENRES = ['Todos', 'Pop', 'Reggaeton', 'Rock', 'Trap', 'R&B', 'Indie'];
+
+    // --- STATE VARIABLES ---
+    let currentGenre = 'Todos';
+    let currentSlide = 0;
+    let isPlaying = false;
+    let currentTrackIndex = 0;
+    let playInterval = null;
+    let progressPercent = 0;
+
+    function initHeroCarousel() {
+      const container = document.getElementById('heroCarousel');
+      const dotsContainer = document.getElementById('heroDots');
+      
+      const featured = [
+        {
+          title: 'HIT ME HARD AND SOFT',
+          subtitle: 'NUEVO ÁLBUM DISPONIBLE',
+          artist: 'Billie Eilish',
+          bg: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&auto=format&fit=crop',
+          trackIndex: 0
+        },
+        {
+          title: 'Nadie Sabe Lo Que Va A Pasar Mañana',
+          subtitle: 'LANZAMIENTO MUNDIAL',
+          artist: 'Bad Bunny',
+          bg: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1200&auto=format&fit=crop',
+          trackIndex: 1
+        },
+        {
+          title: 'The Eras Tour Experience',
+          subtitle: 'EDICIÓN ESPECIAL EN VIVO',
+          artist: 'Taylor Swift',
+          bg: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1200&auto=format&fit=crop',
+          trackIndex: 3
+        }
+      ];
+
+      container.innerHTML = featured.map((item, idx) => `
+        <div class="w-full flex-shrink-0 relative flex items-center p-8 sm:p-16">
+          <img src="${item.bg}" class="absolute inset-0 w-full h-full object-cover filter brightness-[0.35]" alt="${item.title}">
+          <div class="relative z-10 max-w-xl space-y-4">
+            <span class="px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-purple-500/30 text-purple-300 border border-purple-500/40 inline-block">
+              ${item.subtitle}
+            </span>
+            <h1 class="font-display text-3xl sm:text-5xl font-black text-white leading-tight">${item.title}</h1>
+            <p class="text-xl font-medium text-gray-300">${item.artist}</p>
+            <div class="flex items-center gap-4 pt-2">
+              <button onclick="playTrack(${item.trackIndex})" class="px-6 py-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold text-sm shadow-xl flex items-center gap-2 hover:scale-105 active:scale-95 transition">
+                <i data-lucide="play" class="w-4 h-4 fill-current"></i> Reproducir Ahora
+              </button>
+              <button onclick="openArtistModal('${item.artist.toLowerCase().includes('billie') ? 'billie-eilish' : item.artist.toLowerCase().includes('bad') ? 'bad-bunny' : 'taylor-swift'}')" class="px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold text-sm backdrop-blur-md transition">
+                Ver Artista
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      dotsContainer.innerHTML = featured.map((_, i) => `
+        <button onclick="goToSlide(${i})" class="w-2.5 h-2.5 rounded-full transition-all ${i === 0 ? 'bg-purple-500 w-8' : 'bg-gray-600 hover:bg-gray-400'}"></button>
+      `).join('');
+    }
+
+    function goToSlide(index) {
+      const container = document.getElementById('heroCarousel');
+      const dots = document.getElementById('heroDots').children;
+      const total = dots.length;
+      currentSlide = (index + total) % total;
+
+      container.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+      Array.from(dots).forEach((dot, idx) => {
+        if (idx === currentSlide) {
+          dot.className = 'w-8 h-2.5 rounded-full bg-purple-500 transition-all';
+        } else {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-gray-600 hover:bg-gray-400 transition-all';
+        }
+      });
+    }
+
+    function renderGenres() {
+      const container = document.getElementById('genreContainer');
+      container.innerHTML = GENRES.map(g => `
+        <button onclick="filterByGenre('${g}')" class="px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+          currentGenre === g 
+          ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md' 
+          : 'bg-gray-900/80 text-gray-400 hover:bg-gray-800 hover:text-white border border-gray-800'
+        }">
+          ${g}
+        </button>
+      `).join('');
+    }
+
+    function filterByGenre(genre) {
+      currentGenre = genre;
+      renderGenres();
+      renderArtists();
+      renderAlbums();
+      renderSongs();
+
+      const resetBtn = document.getElementById('resetGenreFilter');
+      if (genre !== 'Todos') {
+        resetBtn.classList.remove('hidden');
+      } else {
+        resetBtn.classList.add('hidden');
+      }
+    }
+
+    function renderArtists() {
+      const grid = document.getElementById('artistsGrid');
+      const filtered = currentGenre === 'Todos' ? ARTISTS : ARTISTS.filter(a => a.genre === currentGenre);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<p class="col-span-full text-center py-8 text-gray-400 text-sm">No hay artistas registrados en este género.</p>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(artist => `
+        <div onclick="openArtistModal('${artist.id}')" class="group glass-card rounded-2xl p-4 border border-gray-800/80 hover:border-purple-500/50 hover:scale-[1.02] transition-all cursor-pointer">
+          <div class="relative aspect-square rounded-xl overflow-hidden mb-3">
+            <img src="${artist.image}" alt="${artist.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+              <span class="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-lg ml-auto">
+                <i data-lucide="play" class="w-5 h-5 fill-current ml-0.5"></i>
+              </span>
+            </div>
+          </div>
+          <h3 class="font-bold text-white text-base truncate group-hover:text-purple-400 transition-colors">${artist.name}</h3>
+          <div class="flex items-center justify-between mt-1 text-xs text-gray-400">
+            <span>${artist.genre}</span>
+            <span class="text-purple-400 font-semibold">${artist.monthlyListeners} oyentes</span>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function renderAlbums() {
+      const container = document.getElementById('albumsCarousel');
+      const filtered = currentGenre === 'Todos' ? ALBUMS : ALBUMS.filter(a => a.genre === currentGenre);
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p class="w-full text-center py-8 text-gray-400 text-sm">No hay álbumes para mostrar.</p>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(album => `
+        <div onclick="openAlbumModal('${album.id}')" class="flex-none w-48 sm:w-56 glass-card rounded-2xl p-4 border border-gray-800 hover:border-pink-500/50 hover:scale-105 transition-all cursor-pointer group">
+          <div class="relative aspect-square rounded-xl overflow-hidden mb-3 shadow-md">
+            <img src="${album.cover}" alt="${album.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <span class="p-3 rounded-full bg-pink-500 text-white shadow-xl">
+                <i data-lucide="disc" class="w-6 h-6 animate-spin-slow"></i>
+              </span>
+            </div>
+          </div>
+          <h4 class="font-bold text-white text-sm truncate group-hover:text-pink-400 transition-colors">${album.title}</h4>
+          <p class="text-xs text-gray-400 mt-0.5 truncate">${album.artist} • ${album.year}</p>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function renderSongs() {
+      const container = document.getElementById('songsList');
+      const filtered = currentGenre === 'Todos' ? TRACKS : TRACKS.filter(t => t.genre === currentGenre);
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p class="text-center py-8 text-gray-400 text-sm">No hay canciones disponibles.</p>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map((track, idx) => `
+        <div class="flex items-center justify-between py-3 px-2 rounded-xl hover:bg-gray-800/50 transition-colors group cursor-pointer" onclick="playTrack(${idx})">
+          <div class="flex items-center gap-4 min-w-0">
+            <span class="text-xs font-bold text-gray-500 w-5 text-center group-hover:hidden">${idx + 1}</span>
+            <button class="hidden group-hover:flex w-5 items-center justify-center text-purple-400">
+              <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+            </button>
+            <img src="${track.cover}" class="w-10 h-10 rounded-lg object-cover" alt="${track.title}">
+            <div class="min-w-0">
+              <h5 class="text-sm font-semibold text-white truncate group-hover:text-purple-400 transition-colors">${track.title}</h5>
+              <p class="text-xs text-gray-400 truncate">${track.artist}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-6">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-gray-900 border border-gray-800 text-gray-400 hidden sm:inline-block">${track.genre}</span>
+            <span class="text-xs text-gray-400 font-mono">${track.duration}</span>
+            <button class="text-gray-500 hover:text-pink-500 transition-colors" onclick="event.stopPropagation(); this.classList.toggle('text-pink-500')">
+              <i data-lucide="heart" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function playTrack(index) {
+      currentTrackIndex = index;
+      const track = TRACKS[index];
+      if (!track) return;
+
+      document.getElementById('playerTitle').innerText = track.title;
+      document.getElementById('playerArtist').innerText = track.artist;
+      document.getElementById('playerImg').src = track.cover;
+      document.getElementById('duration').innerText = track.duration;
+
+      isPlaying = true;
+      updatePlayButtonUI();
+      startAudioSimulation();
+    }
+
+    function togglePlay() {
+      isPlaying = !isPlaying;
+      updatePlayButtonUI();
+      if (isPlaying) {
+        startAudioSimulation();
+      } else {
+        clearInterval(playInterval);
+      }
+    }
+
+    function updatePlayButtonUI() {
+      const btn = document.getElementById('playBtn');
+      if (isPlaying) {
+        btn.innerHTML = `<i data-lucide="pause" class="w-5 h-5 fill-current"></i>`;
+      } else {
+        btn.innerHTML = `<i data-lucide="play" class="w-5 h-5 fill-current ml-0.5"></i>`;
+      }
+      lucide.createIcons();
+    }
+
+    function startAudioSimulation() {
+      clearInterval(playInterval);
+      progressPercent = 0;
+      
+      playInterval = setInterval(() => {
+        if (!isPlaying) return;
+        progressPercent += 0.5;
+        if (progressPercent > 100) {
+          progressPercent = 0;
+          nextTrack();
+        }
+        document.getElementById('progressBar').style.width = `${progressPercent}%`;
+
+        // Calculate fake time string
+        const totalSecs = 200; // approximate 3:20
+        const currentSecs = Math.floor((progressPercent / 100) * totalSecs);
+        const mins = Math.floor(currentSecs / 60);
+        const secs = String(currentSecs % 60).padStart(2, '0');
+        document.getElementById('currentTime').innerText = `${mins}:${secs}`;
+      }, 300);
+    }
+
+    function nextTrack() {
+      currentTrackIndex = (currentTrackIndex + 1) % TRACKS.length;
+      playTrack(currentTrackIndex);
+    }
+
+    function prevTrack() {
+      currentTrackIndex = (currentTrackIndex - 1 + TRACKS.length) % TRACKS.length;
+      playTrack(currentTrackIndex);
+    }
+
+    function openArtistModal(artistId) {
+      const artist = ARTISTS.find(a => a.id === artistId);
+      if (!artist) return;
+
+      const modalContent = document.getElementById('modalContent');
+      modalContent.innerHTML = `
+        <div class="relative h-64 sm:h-80 overflow-hidden">
+          <img src="${artist.banner}" class="w-full h-full object-cover" alt="${artist.name}">
+          <div class="absolute inset-0 bg-gradient-to-t from-[#131927] via-[#131927]/60 to-transparent"></div>
+          <div class="absolute bottom-6 left-6 right-6 flex items-end justify-between">
+            <div>
+              <span class="px-3 py-1 rounded-full text-xs font-bold uppercase bg-purple-500/30 text-purple-300 border border-purple-500/40">Verificado</span>
+              <h2 class="font-display text-3xl sm:text-5xl font-black text-white mt-2">${artist.name}</h2>
+              <p class="text-sm text-gray-300 mt-1">${artist.monthlyListeners} oyentes mensuales</p>
+            </div>
+            <button onclick="playTrack(0)" class="px-5 py-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-sm shadow-xl flex items-center gap-2">
+              <i data-lucide="play" class="w-4 h-4 fill-current"></i> Reproducir Top
+            </button>
+          </div>
+        </div>
+
+        <div class="p-6 sm:p-8 space-y-6">
+          <div>
+            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Biografía</h4>
+            <p class="text-sm text-gray-300 leading-relaxed">${artist.bio}</p>
+          </div>
+
+          <div>
+            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Canciones Más Populares</h4>
+            <div class="divide-y divide-gray-800">
+              ${artist.popularSongs.map((s, i) => `
+                <div class="py-3 flex items-center justify-between text-sm hover:bg-gray-800/40 px-3 rounded-xl cursor-pointer" onclick="playTrack(${i})">
+                  <div class="flex items-center gap-3">
+                    <span class="text-xs font-mono text-gray-500">${i + 1}</span>
+                    <div>
+                      <p class="font-semibold text-white">${s.title}</p>
+                      <p class="text-xs text-gray-400">${s.album}</p>
+                    </div>
+                  </div>
+                  <span class="text-xs font-mono text-gray-400">${s.duration}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+      toggleModal('detailModal');
+    }
+
+    function openAlbumModal(albumId) {
+      const album = ALBUMS.find(a => a.id === albumId);
+      if (!album) return;
+
+      const modalContent = document.getElementById('modalContent');
+      modalContent.innerHTML = `
+        <div class="p-6 sm:p-8 flex flex-col sm:flex-row gap-6 items-center border-b border-gray-800">
+          <img src="${album.cover}" class="w-44 h-44 rounded-2xl object-cover shadow-2xl" alt="${album.title}">
+          <div class="space-y-2 text-center sm:text-left">
+            <span class="text-xs font-bold uppercase tracking-wider text-pink-400">Álbum</span>
+            <h2 class="font-display text-2xl sm:text-4xl font-extrabold text-white">${album.title}</h2>
+            <p class="text-sm text-gray-300">${album.artist} • ${album.year} • ${album.genre}</p>
+            <div class="pt-2">
+              <button onclick="playTrack(0)" class="px-6 py-2.5 rounded-full bg-pink-500 hover:bg-pink-600 text-white font-bold text-sm shadow-lg flex items-center gap-2 mx-auto sm:mx-0">
+                <i data-lucide="play" class="w-4 h-4 fill-current"></i> Reproducir Álbum
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 sm:p-8">
+          <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Lista de Canciones (Tracklist)</h4>
+          <div class="divide-y divide-gray-800">
+            ${album.tracks.map((t, i) => `
+              <div class="py-3 px-3 rounded-xl flex items-center justify-between text-sm hover:bg-gray-800/40 cursor-pointer" onclick="playTrack(0)">
+                <div class="flex items-center gap-3">
+                  <span class="text-xs font-mono text-gray-500">${i + 1}</span>
+                  <span class="font-semibold text-white">${t}</span>
+                </div>
+                <i data-lucide="play-circle" class="w-4 h-4 text-gray-500 hover:text-pink-400"></i>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+      toggleModal('detailModal');
+    }
+
+    function toggleModal(modalId) {
+      const modal = document.getElementById(modalId);
+      modal.classList.toggle('hidden');
+    }
+
+    function setupSearch() {
+      const searchInput = document.getElementById('searchInput');
+      const dropdown = document.getElementById('searchResultsDropdown');
+      const clearBtn = document.getElementById('clearSearch');
+
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        
+        if (query.length > 0) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+          dropdown.classList.add('hidden');
+          return;
+        }
+
+        const matchedArtists = ARTISTS.filter(a => a.name.toLowerCase().includes(query));
+        const matchedAlbums = ALBUMS.filter(a => a.title.toLowerCase().includes(query));
+        const matchedTracks = TRACKS.filter(t => t.title.toLowerCase().includes(query));
+
+        if (matchedArtists.length === 0 && matchedAlbums.length === 0 && matchedTracks.length === 0) {
+          dropdown.innerHTML = `<div class="p-4 text-xs text-gray-400 text-center">Sin resultados para "${query}"</div>`;
+        } else {
+          dropdown.innerHTML = `
+            ${matchedArtists.length ? `<div class="px-4 py-2 text-[10px] font-bold text-purple-400 uppercase bg-gray-900/50">Artistas</div>` : ''}
+            ${matchedArtists.map(a => `
+              <div onclick="openArtistModal('${a.id}'); dropdown.classList.add('hidden')" class="px-4 py-2.5 flex items-center gap-3 hover:bg-gray-800 cursor-pointer">
+                <img src="${a.image}" class="w-8 h-8 rounded-full object-cover">
+                <div>
+                  <p class="text-sm text-white font-semibold">${a.name}</p>
+                  <p class="text-[10px] text-gray-400">${a.genre}</p>
+                </div>
+              </div>
+            `).join('')}
+
+            ${matchedAlbums.length ? `<div class="px-4 py-2 text-[10px] font-bold text-pink-400 uppercase bg-gray-900/50">Álbumes</div>` : ''}
+            ${matchedAlbums.map(a => `
+              <div onclick="openAlbumModal('${a.id}'); dropdown.classList.add('hidden')" class="px-4 py-2.5 flex items-center gap-3 hover:bg-gray-800 cursor-pointer">
+                <img src="${a.cover}" class="w-8 h-8 rounded-md object-cover">
+                <div>
+                  <p class="text-sm text-white font-semibold">${a.title}</p>
+                  <p class="text-[10px] text-gray-400">${a.artist}</p>
+                </div>
+              </div>
+            `).join('')}
+
+            ${matchedTracks.length ? `<div class="px-4 py-2 text-[10px] font-bold text-cyan-400 uppercase bg-gray-900/50">Canciones</div>` : ''}
+            ${matchedTracks.map(t => `
+              <div onclick="playTrack(0); dropdown.classList.add('hidden')" class="px-4 py-2.5 flex items-center justify-between hover:bg-gray-800 cursor-pointer">
+                <div class="flex items-center gap-3">
+                  <img src="${t.cover}" class="w-8 h-8 rounded-md object-cover">
+                  <div>
+                    <p class="text-sm text-white font-semibold">${t.title}</p>
+                    <p class="text-[10px] text-gray-400">${t.artist}</p>
+                  </div>
+                </div>
+                <span class="text-xs font-mono text-gray-400">${t.duration}</span>
+              </div>
+            `).join('')}
+          `;
+        }
+        dropdown.classList.remove('hidden');
+      });
+
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearBtn.classList.add('hidden');
+        dropdown.classList.add('hidden');
+      });
+
+      // Mobile search trigger
+      document.getElementById('mobileSearchBtn').addEventListener('click', () => {
+        const overlay = document.getElementById('mobileSearchOverlay');
+        overlay.classList.toggle('hidden');
+      });
+    }
+
+    window.onload = function() {
+      // Initialize icons
+      lucide.createIcons();
+
+      // Render components
+      initHeroCarousel();
+      renderGenres();
+      renderArtists();
+      renderAlbums();
+      renderSongs();
+      setupSearch();
+
+      // Carousel Controls
+      document.getElementById('heroPrev').addEventListener('click', () => goToSlide(currentSlide - 1));
+      document.getElementById('heroNext').addEventListener('click', () => goToSlide(currentSlide + 1));
+      setInterval(() => goToSlide(currentSlide + 1), 6000); // Auto slide
+
+      // Albums Scroll Buttons
+      const albumsCarousel = document.getElementById('albumsCarousel');
+      document.getElementById('albumsPrevBtn').addEventListener('click', () => {
+        albumsCarousel.scrollBy({ left: -300, behavior: 'smooth' });
+      });
+      document.getElementById('albumsNextBtn').addEventListener('click', () => {
+        albumsCarousel.scrollBy({ left: 300, behavior: 'smooth' });
+      });
+
+      // Reset Filter Listener
+      document.getElementById('resetGenreFilter').addEventListener('click', () => filterByGenre('Todos'));
+
+      // Player Controls
+      document.getElementById('playBtn').addEventListener('click', togglePlay);
+      document.getElementById('nextBtn').addEventListener('click', nextTrack);
+      document.getElementById('prevBtn').addEventListener('click', prevTrack);
+
+      // Mobile Menu Toggle
+      document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+        document.getElementById('mobileNav').classList.toggle('hidden');
+      });
+
+      // Subscription Form Listener
+      document.getElementById('subscribeForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        document.getElementById('subscribeSuccess').classList.remove('hidden');
+        e.target.reset();
+      });
+
+      // Progress bar click to seek
+      document.getElementById('progressContainer').addEventListener('click', (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        progressPercent = (clickX / rect.width) * 100;
+        document.getElementById('progressBar').style.width = `${progressPercent}%`;
+      });
+    };
+  </script>
+</body>
+</html>
